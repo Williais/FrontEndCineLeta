@@ -1,32 +1,50 @@
-# React + TypeScript + Vite
+# CineLeta 🎬
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+CineLeta (Cinema e Roleta) é um Progressive Web App (PWA) voltado para cinéfilos indecisos e grupos de amigos. A aplicação atua como um tracker de filmes e um motor de recomendação gamificado, utilizando a API do TMDB e um banco de dados próprio para o histórico do Oscar.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologias Utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+*   **Framework:** React 18 com TypeScript (via Vite)
+*   **Estilização:** Tailwind CSS v3 (Identidade Visual customizada: Dourado, Preto, Vinho e Creme)
+*   **Tipografia:** Playfair Display e Montserrat
+*   **Integrações:** API do TMDB, Web Share API (Mobile)
+*   **Autenticação:** Google OAuth2 (via backend)
 
-## React Compiler
+## ⚙️ Funcionalidades Principais
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Dashboard Pessoal:** Gráficos de horas assistidas, gêneros favoritos e top filmes.
+*   **Randomizador Geral:** Sorteio de filmes aleatórios do TMDB com filtros de qualidade, permitindo ao usuário "Passar" ou "Assistir".
+*   **Randomizador Oscar:** Sorteio baseado em categorias históricas do Oscar (consultando dataset próprio).
+*   **Watch Sessions:** Registro de filmes assistidos em conjunto, compartilhando o histórico sem mesclar as avaliações individuais.
+*   **Compartilhamento Nativo:** Geração de card do filme avaliado para compartilhamento direto no Instagram Stories ou WhatsApp via Web Share API.
 
-## Expanding the Oxlint configuration
+## 🛠️ Como Executar o Projeto
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Pré-requisitos
+*   Node.js (v18+)
+*   NPM ou Yarn
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+### Instalação
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+1. Clone o repositório:
+   ```bash
+   git clone [https://github.com/seu-usuario/cineleta-front.git](https://github.com/seu-usuario/cineleta-front.git)
+
+2. Acesse a pasta do projeto:
+   ```bash 
+   cd cineleta-front
+
+3. Instale as dependências:
+   ```bash 
+   npm install
+
+4. Crie um arquivo .env
+VITE_API_BASE_URL=http://localhost:8080/api
+VITE_TMDB_API_KEY=sua_chave_do_tmdb
+
+5. Inicie o servidor de desenvolvimento:
+   ```bash 
+   npm run dev
+
+👨‍💻 Autor
+Desenvolvido por Willian Padilha
