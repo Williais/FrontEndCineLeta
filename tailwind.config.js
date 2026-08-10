@@ -7,14 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        dourado: '#D4AF37',
-        preto: '#0D0DDD',
-        vinho: '#7A1E2A',
-        creme: '#F5F0E6'
+        background: '#0D0D15',
+        surface: '#1A1B23',
+        gold: '#D4AF37',
+        wine: '#7A1E2A',
+        cream: '#F5F0E6',
       },
       fontFamily: {
-        playfair: ['"Playfair Display"', 'serif'],
-        montserrat: ['Montserrat', 'sans-serif']
+        sans: ['Montserrat', 'sans-serif'],
+        heading: ['Poppins', 'sans-serif'],
       }
     },
   },

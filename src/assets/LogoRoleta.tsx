@@ -1,5 +1,3 @@
-import React from "react";
-
 const LogoRoleta = ({ width = 512, height = 512, className = "" }) => {
   return (
     <svg

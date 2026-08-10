@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-  @apply bg-preto text-creme font-montserrat;
+  @apply bg-background text-cream font-sans antialiased;
 }
