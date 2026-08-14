@@ -1,136 +1,161 @@
-import { Shuffle, Star, X, Loader2 } from 'lucide-react';
+import React from 'react';
+import { Shuffle, Star, X, Loader2, Award, Clock, Heart, Check } from 'lucide-react';
 
 interface MovieDisplayData {
   title: string;
   overview: string;
   posterUrl: string;
   releaseYear: string;
+  director: string;
+  runtime: number;
+  genre: string;
+  isOscarWinner: boolean;
 }
 
 interface RouletteSectionProps {
   movie?: MovieDisplayData | null;
   isLoading?: boolean;
-  onSpinClick?: () => void;
-  onRateClick?: (rating: number) => void;
-  onIgnoreClick?: () => void;
+  userRating?: number;
+  isLoved?: boolean;
+  onSpinClick: () => void;
+  onRateClick: (rating: number) => void;
+  onLoveClick: () => void;
+  onSaveClick: () => void;
+  onIgnoreClick: () => void;
 }
 
 export function RouletteSection({
   movie = null,
   isLoading = false,
+  userRating = 0,
+  isLoved = false,
   onSpinClick,
   onRateClick,
+  onLoveClick,
+  onSaveClick,
   onIgnoreClick
 }: RouletteSectionProps) {
   return (
-    <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
+    <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center py-12">
 
       <button
         onClick={onSpinClick}
         disabled={isLoading}
-        className="group relative flex items-center gap-3 bg-gold hover:bg-gold/90 text-background px-8 py-4 rounded-full font-heading font-bold text-lg shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:shadow-[0_0_50px_rgba(212,175,55,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-12"
+        className="group relative flex items-center gap-3 bg-gradient-to-r from-gold to-[#B37E1C] text-background px-10 py-5 rounded-full font-heading font-bold text-lg shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_50px_rgba(212,175,55,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mb-16 hover:-translate-y-1"
       >
         {isLoading ? (
-          <Loader2 className="animate-spin" size={24} />
+          <Loader2 className="animate-spin text-background" size={24} />
         ) : (
-          <Shuffle className="group-hover:rotate-180 transition-transform duration-500" size={24} />
+          <Shuffle className="group-hover:rotate-180 transition-transform duration-700 text-background" size={24} />
         )}
-        <span>{isLoading ? 'Sorteando...' : 'Sortear Filme'}</span>
+        <span>{isLoading ? 'Buscando no acervo...' : 'Girar a Roleta'}</span>
       </button>
 
- 
-      <div className="w-full relative">
+      {!movie && !isLoading && (
+        <div className="text-center opacity-40">
+          <Shuffle size={64} className="mx-auto mb-6 opacity-20" />
+          <h2 className="font-heading text-2xl font-medium mb-2">O palco está vazio</h2>
+          <p className="font-sans">Clique no botão dourado para descobrir sua próxima sessão.</p>
+        </div>
+      )}
 
-        {!movie && !isLoading && (
-          <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-white/10 rounded-3xl bg-surface/30">
-            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
-              <Shuffle className="text-white/20" size={40} />
+      {movie && !isLoading && (
+        <div className="w-full flex flex-col md:flex-row bg-surface border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl relative">
+          
+          {movie.isOscarWinner && (
+            <div className="absolute top-6 left-6 z-20 bg-gradient-to-r from-gold to-[#B37E1C] text-background text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
+              <Award size={14} /> Vencedor do Oscar
             </div>
-            <h2 className="text-2xl font-heading font-semibold text-white/70 mb-2">
-              Pronto para uma nova descoberta?
-            </h2>
-            <p className="text-white/40 max-w-md">
-              Clique no botão acima para girar a roleta e receber uma recomendação aleatória do universo do cinema.
-            </p>
-          </div>
-        )}
+          )}
 
-        {isLoading && !movie && (
-          <div className="animate-pulse flex flex-col md:flex-row gap-8 bg-surface p-6 rounded-3xl border border-white/5">
-            <div className="w-full md:w-[300px] h-[450px] bg-white/5 rounded-2xl shrink-0"></div>
-            <div className="flex-1 py-4 space-y-6">
-              <div className="h-10 bg-white/5 rounded-lg w-3/4"></div>
-              <div className="h-4 bg-white/5 rounded w-1/4 mb-8"></div>
-              <div className="space-y-3">
-                <div className="h-4 bg-white/5 rounded w-full"></div>
-                <div className="h-4 bg-white/5 rounded w-full"></div>
-                <div className="h-4 bg-white/5 rounded w-5/6"></div>
-              </div>
-            </div>
+          <div className="w-full md:w-[400px] shrink-0 relative group">
+            <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent z-10 md:hidden"></div>
+            <img 
+              src={movie.posterUrl} 
+              alt={`Pôster de ${movie.title}`} 
+              className="w-full h-[500px] md:h-[600px] object-cover transition-transform duration-700 group-hover:scale-105"
+            />
           </div>
-        )}
 
-        {movie && !isLoading && (
-          <div className="flex flex-col md:flex-row gap-8 bg-surface/80 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative">
+          <div className="flex flex-col flex-1 p-8 md:p-12 justify-between z-20 -mt-20 md:mt-0 relative">
             
-            {/* Pôster */}
-            <div className="w-full md:w-[320px] shrink-0 group">
-              <img 
-                src={movie.posterUrl} 
-                alt={`Pôster de ${movie.title}`} 
-                className="w-full h-auto object-cover rounded-2xl shadow-lg group-hover:scale-[1.02] transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex flex-col flex-1 justify-between">
+            <div className="space-y-6">
               <div>
-                <div className="flex items-center gap-4 mb-4">
-                  <h2 className="text-3xl md:text-4xl font-heading font-bold text-cream">
+                <div className="flex flex-wrap items-baseline gap-4 mb-2">
+                  <h2 className="text-4xl md:text-5xl font-heading font-bold text-cream drop-shadow-md">
                     {movie.title}
                   </h2>
-                  <span className="px-3 py-1 bg-white/10 text-white/70 rounded-md text-sm font-medium">
-                    {movie.releaseYear}
+                  <span className="text-xl text-white/40 font-heading">({movie.releaseYear})</span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-white/50">
+                  <span>{movie.director}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                  <span>{movie.genre}</span>
+                  <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                  <span className="flex items-center gap-1">
+                    <Clock size={14} /> {movie.runtime} min
                   </span>
                 </div>
-                
-                <p className="text-white/60 text-lg leading-relaxed mb-8">
-                  {movie.overview}
-                </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 mt-8 pt-8 border-t border-white/10">
+              <p className="text-white/70 text-lg leading-relaxed font-sans">
+                {movie.overview}
+              </p>
+            </div>
 
-                <div className="flex-1 bg-white/5 rounded-2xl p-4 flex flex-col items-center justify-center border border-white/5 hover:border-gold/30 transition-colors">
-                  <span className="text-sm text-white/50 mb-3 font-medium uppercase tracking-wider">
-                    Avaliar Filme
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button 
-                        key={star}
-                        onClick={() => onRateClick && onRateClick(star)}
-                        className="text-white/20 hover:text-gold hover:scale-110 transition-all duration-200"
-                        title={`Dar ${star} estrelas`}
-                      >
-                        <Star size={32} strokeWidth={1.5} />
-                      </button>
-                    ))}
-                  </div>
+            <div className="mt-12 pt-8 border-t border-white/10 flex flex-col xl:flex-row items-center gap-6">
+
+              <div className="flex items-center gap-6 bg-background/50 rounded-2xl p-4 flex-1 w-full justify-between sm:justify-start">
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button 
+                      key={star}
+                      onClick={() => onRateClick(star)}
+                      className="transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <Star 
+                        size={28} 
+                        className={star <= userRating 
+                          ? "text-gold fill-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]" 
+                          : "text-white/20"} 
+                      />
+                    </button>
+                  ))}
                 </div>
+                
+                <div className="w-px h-8 bg-white/10"></div>
+                
+                <button 
+                  onClick={onLoveClick}
+                  className="transition-transform hover:scale-110 focus:outline-none flex items-center gap-2 text-white/40 hover:text-wine"
+                >
+                  <Heart 
+                    size={28} 
+                    className={isLoved ? "text-wine fill-wine drop-shadow-[0_0_8px_rgba(122,30,42,0.4)]" : ""} 
+                  />
+                </button>
+              </div>
 
+              <div className="flex items-center gap-3 w-full xl:w-auto">
                 <button 
                   onClick={onIgnoreClick}
-                  className="w-full sm:w-auto h-full min-h-[96px] px-8 bg-wine/10 text-wine hover:bg-wine hover:text-white rounded-2xl flex flex-col items-center justify-center gap-2 border border-wine/20 transition-all group"
+                  className="flex-1 xl:flex-none px-6 py-4 rounded-xl font-medium text-wine bg-wine/10 border border-wine/20 hover:bg-wine hover:text-cream transition-all flex items-center justify-center gap-2"
                 >
-                  <X size={28} className="group-hover:rotate-90 transition-transform duration-300" />
-                  <span className="font-medium">Ignorar</span>
+                  <X size={20} /> Ignorar
                 </button>
-                
+                <button 
+                  onClick={onSaveClick}
+                  className="flex-1 xl:flex-none px-8 py-4 rounded-xl font-bold text-background bg-cream hover:bg-white transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <Check size={20} /> Salvar Filme
+                </button>
               </div>
+
             </div>
           </div>
-        )}
-      </div>
-    </main>
+        </div>
+      )}
+    </div>
   );
 }
