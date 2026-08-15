@@ -39,6 +39,8 @@ export function SearchSection({
   onClearSelection,
   onRateClick,
   onAddMovieClick
+
+
 }: SearchSectionProps) {
   return (
     <div className="w-full max-w-5xl mx-auto py-8 px-4 sm:px-6 min-h-[calc(100vh-100px)] flex flex-col">

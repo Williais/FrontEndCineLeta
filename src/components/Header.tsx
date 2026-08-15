@@ -1,15 +1,17 @@
-import { LogIn, User, LogOut, Shuffle, Search, LayoutDashboard } from 'lucide-react';
-import LogoRoleta from '../assets/LogoRoleta';
+import { LogIn, User, LogOut, Shuffle, Search, LayoutDashboard } from 'lucide-react'
+import LogoRoleta from '../assets/LogoRoleta'
 
 interface HeaderProps {
-  activeTab: 'roulette' | 'search' | 'dashboard';
-  isLoggedIn?: boolean;
-  userName?: string;
-  userPhoto?: string;
+  activeTab: 'roulette' | 'search' | 'dashboard'
+  isLoggedIn?: boolean
+  userName?: string
+  userPhoto?: string
   onTabChange: (tab: 'roulette' | 'search' | 'dashboard') => void;
-  onLoginClick: () => void;
-  onLogoutClick: () => void;
+  onLoginClick: () => void
+  onLogoutClick: () => void
+  onProfileClick: () => void
 }
+
 
 export function Header({ 
   activeTab,
@@ -18,14 +20,15 @@ export function Header({
   userPhoto,
   onTabChange,
   onLoginClick, 
-  onLogoutClick 
+  onLogoutClick,
+  onProfileClick
 }: HeaderProps) {
   
   const navItems = [
     { id: 'roulette', label: 'Roleta', icon: Shuffle },
     { id: 'search', label: 'Adicionar (TMDB)', icon: Search },
     { id: 'dashboard', label: 'Meu Painel', icon: LayoutDashboard },
-  ] as const;
+  ] as const
 
   return (
     <header className="w-full bg-background/80 border-b border-white/5 py-4 px-6 sticky top-0 z-50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -67,17 +70,25 @@ export function Header({
             </button>
           ) : (
             <div className="flex items-center gap-4 bg-surface/30 pl-2 pr-4 py-1.5 rounded-full border border-white/5">
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
-                {userPhoto ? (
-                  <img src={userPhoto} alt="Perfil" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-surface flex items-center justify-center">
-                    <User size={16} className="text-white/50" />
-                  </div>
-                )}
-              </div>
-              <span className="font-medium text-sm text-cream hidden sm:block">{userName.split(' ')[0]}</span>
+              <button 
+                onClick={onProfileClick}
+                className="flex items-center gap-3 hover:opacity-75 transition-opacity focus:outline-none"
+                title="Configurações da Conta"
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
+                  {userPhoto ? (
+                    <img src={userPhoto} alt="Perfil" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-surface flex items-center justify-center">
+                      <User size={16} className="text-white/50" />
+                    </div>
+                  )}
+                </div>
+                <span className="font-medium text-sm text-cream hidden sm:block">{userName.split(' ')[0]}</span>
+              </button>
+              
               <div className="w-px h-4 bg-white/10 mx-1 hidden sm:block"></div>
+              
               <button 
                 onClick={onLogoutClick}
                 className="text-white/40 hover:text-wine transition-colors"
