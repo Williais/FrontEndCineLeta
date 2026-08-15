@@ -2,7 +2,7 @@ import { LogIn, User, LogOut, Shuffle, Search, LayoutDashboard } from 'lucide-re
 import LogoRoleta from '../assets/LogoRoleta'
 
 interface HeaderProps {
-  activeTab: 'roulette' | 'search' | 'dashboard'
+  activeTab: 'roulette' | 'search' | 'dashboard' | 'profile'
   isLoggedIn?: boolean
   userName?: string
   userPhoto?: string

@@ -9,6 +9,8 @@ export interface TMDBMovie {
   director?: string;
   overview: string;
   tmdbRating: number;
+  runtime?: number;
+  genre?: string;
 }
 
 interface SearchSectionProps {
@@ -146,6 +148,20 @@ export function SearchSection({
                   <>
                     <span className="w-1 h-1 rounded-full bg-white/20"></span>
                     <span>Dirigido por <span className="text-cream">{selectedMovie.director}</span></span>
+                  </>
+                )}
+
+                {selectedMovie.runtime && selectedMovie.runtime > 0 ? (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                    <span>{selectedMovie.runtime} min</span>
+                  </>
+                ) : null}
+
+                {selectedMovie.genre && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                    <span>{selectedMovie.genre}</span>
                   </>
                 )}
               </div>
