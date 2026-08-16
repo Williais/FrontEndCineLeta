@@ -77,7 +77,12 @@ export function Header({
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden border border-gold/30">
                   {userPhoto ? (
-                    <img src={userPhoto} alt="Perfil" className="w-full h-full object-cover" />
+                    <img 
+                      src={userPhoto} 
+                      alt="Perfil" 
+                      className="w-full h-full object-cover" 
+                      referrerPolicy="no-referrer" 
+                    />
                   ) : (
                     <div className="w-full h-full bg-surface flex items-center justify-center">
                       <User size={16} className="text-white/50" />

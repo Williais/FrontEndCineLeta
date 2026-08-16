@@ -1,5 +1,6 @@
-import React from 'react';
-import { Search, Star, Plus, ArrowLeft, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Star, Plus, ArrowLeft, Loader2, Heart, Users, X } from 'lucide-react';
+import {api} from '../services/api'
 
 export interface TMDBMovie {
   id: number;
@@ -19,14 +20,14 @@ interface SearchSectionProps {
   searchResults: TMDBMovie[];
   selectedMovie: TMDBMovie | null;
   userRating: number;
-  
-
+  isLoved: boolean;
   onSearchChange: (query: string) => void;
   onSearchSubmit: (e: React.FormEvent) => void;
   onMovieSelect: (movie: TMDBMovie) => void;
   onClearSelection: () => void;
   onRateClick: (rating: number) => void;
-  onAddMovieClick: () => void;
+  onLoveClick: () => void;
+  onAddMovieClick: (taggedEmails: string[]) => void;
 }
 
 export function SearchSection({
@@ -35,18 +36,36 @@ export function SearchSection({
   searchResults,
   selectedMovie,
   userRating,
+  isLoved,
   onSearchChange,
   onSearchSubmit,
   onMovieSelect,
   onClearSelection,
   onRateClick,
+  onLoveClick,
   onAddMovieClick
-
-
 }: SearchSectionProps) {
+  const [emailInput, setEmailInput] = useState('');
+  const [friends, setFriends] = useState<any[]>([]);
+  const [friendResults, setFriendResults] = useState<any[]>([]);
+  const [isSearchingFriends, setIsSearchingFriends] = useState(false);
+
+  const handleAddEmail = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && emailInput.trim() !== '') {
+      e.preventDefault();
+      if (!friends.includes(emailInput.trim()) && emailInput.includes('@')) {
+        setFriends([...friends, emailInput.trim()]);
+      }
+      setEmailInput('');
+    }
+  };
+
+  const removeEmail = (emailToRemove: string) => {
+    setFriends(friends.filter((e: string) => e !== emailToRemove));
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto py-8 px-4 sm:px-6 min-h-[calc(100vh-100px)] flex flex-col">
-      
       {!selectedMovie && (
         <div className="flex-1 flex flex-col animate-in fade-in duration-500">
           <div className="mb-8 text-center sm:text-left">
@@ -102,7 +121,6 @@ export function SearchSection({
               ))}
             </div>
           ) : (
-            
             searchQuery && !isSearching && (
               <div className="flex-1 flex flex-col items-center justify-center text-white/30 border border-dashed border-white/10 rounded-3xl p-12 bg-surface/30">
                 <Search size={48} className="mb-4 opacity-20" />
@@ -112,7 +130,6 @@ export function SearchSection({
           )}
         </div>
       )}
-
 
       {selectedMovie && (
         <div className="animate-in slide-in-from-bottom-8 fade-in duration-500">
@@ -124,7 +141,6 @@ export function SearchSection({
           </button>
 
           <div className="bg-surface border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row gap-8 lg:gap-12 shadow-2xl relative overflow-hidden">
-            
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
             <img 
@@ -150,14 +166,12 @@ export function SearchSection({
                     <span>Dirigido por <span className="text-cream">{selectedMovie.director}</span></span>
                   </>
                 )}
-
                 {selectedMovie.runtime && selectedMovie.runtime > 0 ? (
                   <>
                     <span className="w-1 h-1 rounded-full bg-white/20"></span>
                     <span>{selectedMovie.runtime} min</span>
                   </>
                 ) : null}
-
                 {selectedMovie.genre && (
                   <>
                     <span className="w-1 h-1 rounded-full bg-white/20"></span>
@@ -166,16 +180,91 @@ export function SearchSection({
                 )}
               </div>
 
-              <p className="text-white/60 text-base leading-relaxed mb-10 flex-1 font-sans">
+              <p className="text-white/60 text-base leading-relaxed mb-8 flex-1 font-sans">
                 {selectedMovie.overview || "Nenhuma sinopse disponível para este filme no momento."}
               </p>
+
+              <div className="mb-8 bg-black/20 p-4 rounded-xl border border-white/5">
+                <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white/40 mb-3">
+                  <Users size={16} /> Assistiu com alguém? (Watch Party)
+                </label>
+                
+                {/* Lista de Amigos Selecionados */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {friends.map((friend: any) => (
+                    <span key={friend.email} className="bg-gold/10 border border-gold/20 text-gold pl-1 pr-3 py-1 rounded-full text-sm flex items-center gap-2 animate-in zoom-in">
+                      <div className="w-6 h-6 rounded-full bg-gold text-background flex items-center justify-center text-[10px] font-bold">
+                        {friend.nickname.charAt(0).toUpperCase()}
+                      </div>
+                      {friend.nickname} 
+                      <X size={14} className="cursor-pointer hover:text-white ml-1" onClick={() => setFriends(friends.filter((f: any) => f.email !== friend.email))} />
+                    </span>
+                  ))}
+                </div>
+                
+                {/* Campo de Busca (Dropdown) */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    {isSearchingFriends ? <Loader2 size={16} className="animate-spin text-gold" /> : <Search size={16} className="text-white/30" />}
+                  </div>
+                  <input 
+                    type="text"
+                    value={emailInput}
+                    onChange={(e) => {
+                      const query = e.target.value;
+                      setEmailInput(query);
+                      if (query.trim().length >= 2) {
+                        setIsSearchingFriends(true);
+                        setTimeout(async () => {
+                          try {
+                            // Certifique-se de que a API está importada corretamente no topo do arquivo
+                            const res = await api(`/api/users/search?query=${query}`);
+                            setFriendResults(res);
+                          } catch (err) {}
+                          setIsSearchingFriends(false);
+                        }, 500);
+                      } else {
+                        setFriendResults([]);
+                      }
+                    }}
+                    placeholder="Busque pelo Nickname ou E-mail..."
+                    className="w-full bg-background border border-white/10 rounded-lg pl-10 pr-4 py-3 text-sm text-cream focus:outline-none focus:border-gold/50"
+                  />
+                  
+                  {friendResults.length > 0 && emailInput.trim().length >= 2 && (
+                    <div className="absolute top-full mt-2 left-0 w-full bg-surface border border-white/10 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto divide-y divide-white/5">
+                      {friendResults.map((user: any) => (
+                        <div 
+                          key={user.email} 
+                          onClick={() => {
+                            if (!friends.some((f: any) => f.email === user.email)) {
+                              setFriends([...friends, user]);
+                            }
+                            setEmailInput('');
+                            setFriendResults([]);
+                          }}
+                          className="p-3 flex items-center gap-3 cursor-pointer hover:bg-white/5 transition-colors"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/30 text-gold flex items-center justify-center text-xs font-bold">
+                            {user.nickname.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-cream font-medium text-sm leading-tight">{user.nickname}</p>
+                            <p className="text-white/30 text-xs">{user.email}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="bg-background/80 p-6 rounded-2xl border border-gold/10 flex flex-col sm:flex-row items-center justify-between gap-6 mt-auto">
                 <div>
                   <span className="block text-xs uppercase tracking-wider font-semibold text-white/40 mb-3 text-center sm:text-left">
                     Sua Avaliação
                   </span>
-                  <div className="flex items-center justify-center sm:justify-start gap-1.5">
+                  <div className="flex items-center justify-center sm:justify-start mb-3 gap-1.5">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
@@ -191,20 +280,29 @@ export function SearchSection({
                       </button>
                     ))}
                   </div>
-                </div>
                 
-                <button 
-                  onClick={onAddMovieClick}
-                  disabled={userRating === 0}
-                  className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-background bg-gold hover:bg-[#FFF0A8] transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Plus size={20} /> Registrar Filme
-                </button>
+                <div className="flex gap-4 w-full sm:w-auto">
+                  <button 
+                    onClick={onLoveClick}
+                    className={`px-6 py-4 rounded-xl border transition-all flex items-center justify-center ${isLoved ? 'border-wine bg-wine/10 text-wine' : 'border-white/20 text-white/40 hover:border-white/40 hover:text-white'}`}
+                  >
+                    <Heart size={20} className={isLoved ? "fill-wine" : ""} />
+                  </button>
+                  <button 
+                    onClick={() => { onAddMovieClick(friends.map((f: any) => f.email)); setFriends([]); }}
+                    disabled={userRating === 0}
+                    className="flex-1 sm:w-auto px-8 py-4 rounded-xl font-bold text-background bg-gold hover:bg-[#FFF0A8] transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Plus size={20} /> <span className="hidden sm:inline">Adicionar ao Histórico</span><span className="sm:hidden">Adicionar</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
       )}
     </div>
+    
   );
 }
