@@ -36,7 +36,7 @@ export function RouletteSection({
   onIgnoreClick
 }: RouletteSectionProps) {
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center py-12">
+    <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-center py-12">
 
       <button
         onClick={onSpinClick}

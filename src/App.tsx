@@ -104,6 +104,35 @@ function App() {
     } finally {
       setIsSpinning(false);
     }
+  }
+
+  const handleSaveInteraction = async (movie: any, rating: number, isFavorite: boolean, isIgnored: boolean) => {
+    if (!user.isLoggedIn) {
+      alert("Você precisa fazer login para interagir com os filmes.");
+      return;
+    }
+
+    try {
+      await api('/api/user-movies/evaluate', {
+        method: 'POST',
+        body: JSON.stringify({
+          tmdbId: movie.tmdbId || movie.id, 
+          rating: rating,
+          isFavorite: isFavorite,
+          isIgnored: isIgnored
+        })
+      });
+
+      if (isIgnored) {
+        console.log(`Filme "${movie.title}" ignorado e salvo no histórico.`);
+      } else {
+       console.log(`Filme "${movie.title}" salvo com sucesso no seu histórico!`);
+      }
+
+    } catch (error) {
+      console.error("Erro ao salvar interação no banco:", error);
+      alert("Erro de comunicação com o servidor ao salvar o filme.");
+    }
   };
 
   useEffect(() => {
@@ -150,11 +179,17 @@ function App() {
             onRateClick={setMovieRating}
             onLoveClick={() => setIsMovieLoved(!isMovieLoved)}
             onIgnoreClick={() => {
+              handleSaveInteraction(currentMovie, 0, false, true);
               setCurrentMovie(null);
               setMovieRating(0);
               setIsMovieLoved(false);
             }}
-            onSaveClick={() => console.log('Em breve: Salvar no PostgreSQL!')}
+            onSaveClick={() => {
+              handleSaveInteraction(currentMovie, movieRating, isMovieLoved, false);
+              setCurrentMovie(null);
+              setMovieRating(0);
+              setIsMovieLoved(false);
+            }}
           />
 
         )}
@@ -186,8 +221,9 @@ function App() {
             onClearSelection={() => setSelectedSearchMovie(null)}
             onRateClick={setManualRating}
             onAddMovieClick={() => {
-              console.log("Filme selecionado para salvar:", selectedSearchMovie, "Nota:", manualRating);
-              alert(`Filme "${selectedSearchMovie?.title}" pronto para ser salvo com nota ${manualRating}! (Conectaremos no banco a seguir)`);
+              handleSaveInteraction(selectedSearchMovie, manualRating, false, false);
+              setSelectedSearchMovie(null);
+              setManualRating(0);
             }}
           />
         )}
