@@ -1,4 +1,4 @@
-import { Film, Clock, Star, Heart, Award, Users, Trophy, Clapperboard, Flame } from 'lucide-react';
+import { Film, Clock, Star, Heart, Award, Users, Trophy, Clapperboard, Flame, Share2, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 
@@ -39,16 +39,52 @@ export function DashboardSection() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const data = await api('/api/user-movies/dashboard');
-        setStats(data); // Agora os dados REAIS do Java alimentam a tela!
+        const data = await api('/api/user-movies/dashboard')
+        setStats(data)
       } catch (error) {
-        console.error("Erro ao carregar dashboard:", error);
+        console.error("Erro ao carregar dashboard:", error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     };
-    fetchDashboard();
-  }, []);
+    fetchDashboard()
+  }, [])
+
+  const handleShare = async (movie: DashboardMovie) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'CineLeta',
+          text: `Acabei de avaliar "${movie.title}" com ${movie.rating} estrelas no CineLeta!`,
+          url: window.location.href
+        })
+      } catch (error) {
+        console.log('Compartilhamento cancelado ou falhou.')
+      }
+    } else {
+      alert('O seu navegador não suporta o compartilhamento nativo.')
+    }
+  }
+
+  const handleDelete = async (tmdbId: number) => {
+    if (window.confirm("Tem certeza que deseja remover este filme do seu histórico?")) {
+      try {
+        await api(`/api/user-movies/${tmdbId}`, { method: 'DELETE' })
+        setStats(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            recentMovies: prev.recentMovies.filter(m => m.tmdbId !== tmdbId),
+            lovedMovies: prev.lovedMovies.filter(m => m.tmdbId !== tmdbId),
+            highestRated: prev.highestRated.filter(m => m.tmdbId !== tmdbId),
+            oscarMovies: prev.oscarMovies.filter(m => m.tmdbId !== tmdbId),
+          }
+        })
+      } catch (error) {
+        alert("Erro ao remover o filme.")
+      }
+    }
+  }
 
   const formatHours = (minutes: number) => {
     if (!minutes) return "0h 0m";
@@ -173,15 +209,26 @@ export function DashboardSection() {
                 <div className="py-8 text-center text-white/30">Nenhum filme avaliado ainda.</div>
               ) : (
                 stats.recentMovies.slice(0, 5).map((movie) => (
-                  <div key={movie.tmdbId} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/[0.02] transition-colors border border-transparent hover:border-white/5">
+                  <div key={movie.tmdbId} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/[0.02] transition-colors border border-transparent hover:border-white/5 group">
                     <img src={movie.posterPath || 'https://via.placeholder.com/500x750'} alt={movie.title} className="w-12 h-16 object-cover rounded-lg shadow-sm" />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-cream font-bold text-sm truncate">{movie.title}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex gap-0.5">
-                          {[1, 2, 3, 4, 5].map((s) => (<Star key={s} size={12} className={s <= movie.rating ? "text-gold fill-gold" : "text-white/10"} />))}
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((s) => (<Star key={s} size={12} className={s <= movie.rating ? "text-gold fill-gold" : "text-white/10"} />))}
+                          </div>
+                          {movie.isFavorite && <Heart size={12} className="text-wine fill-wine" />}
                         </div>
-                        {movie.isFavorite && <Heart size={12} className="text-wine fill-wine" />}
+                  
+                        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => handleShare(movie)} className="text-white/40 hover:text-gold transition-colors" title="Compartilhar">
+                            <Share2 size={16} />
+                          </button>
+                          <button onClick={() => handleDelete(movie.tmdbId)} className="text-white/40 hover:text-red-400 transition-colors" title="Remover do Histórico">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
