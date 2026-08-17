@@ -43,7 +43,10 @@ function App() {
 
   const [activeTab, setActiveTab] = useState<'roulette'| 'search'| 'dashboard' | 'profile'>('roulette')
 
-  const handleLogin = () => window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  const handleLogin = () => {
+  const baseUrl = import.meta.env.VITE_API_URL;
+    window.location.href = `${baseUrl}/oauth2/authorization/google`;
+  };
   const handleLogout = () => setUser({isLoggedIn: false, name: 'Visitante', email: '', photo: null, memberSince: ''});
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
