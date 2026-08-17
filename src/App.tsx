@@ -44,7 +44,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'roulette'| 'search'| 'dashboard' | 'profile'>('roulette')
 
   const handleLogin = () => {
-  const baseUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://179.198.120.245:8080'
     window.location.href = `${baseUrl}/oauth2/authorization/google`;
   };
   const handleLogout = () => setUser({isLoggedIn: false, name: 'Visitante', email: '', photo: null, memberSince: ''});
