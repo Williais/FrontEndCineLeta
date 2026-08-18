@@ -44,7 +44,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'roulette'| 'search'| 'dashboard' | 'profile'>('roulette')
 
   const handleLogin = () => {
-  const baseUrl = 'https://www.devhubs.tech/cineleta'
+  const baseUrl = import.meta.env.VITE_API_URL
     window.location.href = `${baseUrl}/oauth2/authorization/google`;
   };
   const handleLogout = () => setUser({isLoggedIn: false, name: 'Visitante', email: '', photo: null, memberSince: ''});
